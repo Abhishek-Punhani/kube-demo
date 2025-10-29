@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      env: demo
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        env: demo
+        tier: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: punhaniabhishek/kube-demo:web
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: "production"
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-server-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      env: demo
+      tier: demo-server
+      type: backend
+  template:
+    metadata:
+      labels:
+        env: demo
+        tier: demo-server
+        type: backend
+    spec:
+      containers:
+      - name: demo-server
+        image: punhaniabhishek/kube-demo:demo-server
+        ports:
+        - containerPort: 4000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        envFrom:
+        - configMapRef:
+            name: demo-server-config
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      env: demo
+      tier: demo-server
+      type: redis
+  template:
+    metadata:
+      labels:
+        env: demo
+        tier: demo-server
+        type: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:alpine
+        ports:
+        - containerPort: 6379
