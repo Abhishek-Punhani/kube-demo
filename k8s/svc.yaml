@@ -7,8 +7,8 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - port: 80
-    targetPort: 3000
+    - port: 80
+      targetPort: 3000
   selector:
     env: demo
     tier: frontend
@@ -23,10 +23,10 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - port: 4000
-    targetPort: 4000
+    - port: 4000
+      targetPort: 4000
   selector:
-    env: demo 
+    env: demo
     tier: demo-server
 ---
 apiVersion: v1
@@ -39,15 +39,14 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - port: 6379  
-    targetPort: 6379
+    - port: 6379
+      targetPort: 6379
   selector:
     env: demo
     tier: demo-server
-    type: redis 
+    type: redis
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -57,12 +56,12 @@ metadata:
 spec:
   type: NodePort
   ports:
-  - nodePort: 30001
-    port: 80
-    targetPort: 3000  # Fixed: frontend container listens on 3000
+    - nodePort: 30001
+      port: 80
+      targetPort: 3000
   selector:
     env: demo
-    tier: frontend  # Fixed: complete selector
+    tier: frontend
 
 ---
 apiVersion: v1
@@ -74,9 +73,9 @@ metadata:
 spec:
   type: NodePort
   ports:
-  - nodePort: 30002
-    port: 4000
-    targetPort: 4000
+    - nodePort: 30002
+      port: 4000
+      targetPort: 4000
   selector:
     env: demo
     tier: demo-server
@@ -92,9 +91,9 @@ metadata:
 spec:
   type: NodePort
   ports:
-  - nodePort: 30003
-    port: 6379
-    targetPort: 6379
+    - nodePort: 30003
+      port: 6379
+      targetPort: 6379
   selector:
     env: demo
     tier: demo-server
