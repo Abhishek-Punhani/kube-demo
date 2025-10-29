@@ -1,0 +1,40 @@
+services:
+  demo-server:
+    build:
+      context: .
+      dockerfile: apps/demo-server/Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - apps/demo-server/.env
+      - ./.env
+    depends_on:
+      - redis
+    networks:
+      - kube-demo
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - demo-server
+    networks:
+      - kube-demo
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - kube-demo
+
+networks:
+  kube-demo:
+    driver: bridge

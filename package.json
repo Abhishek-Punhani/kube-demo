@@ -19,6 +19,7 @@
     "@types/express-rate-limit": "^6.0.2",
     "@types/express-session": "^1.18.2",
     "@types/helmet": "^4.0.0",
+    "@types/http-errors": "^2.0.5",
     "@types/morgan": "^1.9.10",
     "@types/node": "^22.15.3",
     "@types/socket.io": "^3.0.2",

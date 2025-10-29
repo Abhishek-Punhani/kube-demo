@@ -16,8 +16,7 @@ class AuthClient {
   private constructor() {
     // Use internal URL for Docker network, fallback to localhost for dev
     this.authServiceUrl =
-      process.env.AUTH_SERVER_URL ||
-      "http://localhost:4000";
+      process.env.AUTH_SERVER_URL || "http://localhost:4000";
   }
 
   public static getInstance(): AuthClient {
@@ -42,7 +41,7 @@ class AuthClient {
           headers: {
             "X-Internal-Service": "true",
             "X-Service-Secret":
-              process.env.INTERNAL_SERVICE_SECRET || "bullreckon-secret",
+              process.env.INTERNAL_SERVICE_SECRET || "DemoService-secret",
           },
           timeout: 5000,
         }
