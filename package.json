@@ -9,6 +9,19 @@
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
+    "@types/body-parser": "^1.19.6",
+    "@types/compression": "^1.8.1",
+    "@types/connect-mongo": "^3.1.6",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.5",
+    "@types/express-fileupload": "^1.5.1",
+    "@types/express-rate-limit": "^6.0.2",
+    "@types/express-session": "^1.18.2",
+    "@types/helmet": "^4.0.0",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^22.15.3",
+    "@types/socket.io": "^3.0.2",
     "prettier": "^3.6.2",
     "turbo": "^2.5.8",
     "typescript": "5.9.2"
@@ -16,5 +29,27 @@
   "packageManager": "pnpm@9.0.0",
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "axios": "^1.13.1",
+    "body-parser": "^2.2.0",
+    "bullmq": "^5.62.0",
+    "compression": "^1.8.1",
+    "connect-mongo": "^5.1.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-fileupload": "^1.5.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^8.2.0",
+    "express-session": "^1.18.2",
+    "helmet": "^8.1.0",
+    "http-errors": "^2.0.0",
+    "ioredis": "^5.8.2",
+    "mongoose": "^8.19.2",
+    "morgan": "^1.10.1",
+    "socket.io": "^4.8.1",
+    "zod": "^4.1.12"
   }
 }
