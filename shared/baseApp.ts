@@ -24,6 +24,7 @@ import { DatabaseManager } from "./dbManager";
 
 import winston from "winston";
 const LokiTransport = require("winston-loki");
+const promClient = require("prom-client");
 
 export interface AppOptions {
   serviceName: string;
@@ -55,7 +56,7 @@ export class BaseApp {
     this.app = express();
     this.config = options.config;
     this.serviceName = options.serviceName;
-    this.promClient = require("prom-client");
+    this.promClient = promClient;
 
     this.setupLogger();
     this.setupPrometheus();
