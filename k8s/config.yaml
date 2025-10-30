@@ -28,6 +28,16 @@ data:
     daemonize no
     supervised no
     pidfile /var/run/redis_6379.pid
+
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+    scrape_configs:
+      - job_name: 'demo-server'
+        static_configs:
+          - targets: ['demo-server-clusterip:4000']
+        metrics_path: /metrics
+        
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -35,10 +45,11 @@ metadata:
   name: demo-server-config
 data:
   NODE_ENV: "production"
-  CLIENT_URL: "http://localhost:3000"
+  CLIENT_URL: "http://frontend-clusterip:2000"
   REDIS_HOST: "redis"
   REDIS_PORT: "6379"
   DISABLE_REDIS_QUEUES: "false"
   PENDING_ORDER_WORKER_CONCURRENCY: "5"
   EMAIL_WORKER_CONCURRENCY: "10"
   RATE_LIMIT_REQUESTS: "100"
+  LOKI_URL: "http://grafana-loki-clusterip:3100"

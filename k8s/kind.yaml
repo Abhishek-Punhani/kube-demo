@@ -9,5 +9,25 @@ nodes:
         hostPort: 4000
       - containerPort: 30003
         hostPort: 6379
+      - containerPort: 30004
+        hostPort: 9090
+      - containerPort: 30005
+        hostPort: 3000
+      - containerPort: 30006
+        hostPort: 3100
   - role: worker
   - role: worker
+  - role: worker
+    kubeadmConfigPatches:
+      - |
+        kind: JoinConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "dedicated=monitoring"
+  - role: worker
+    kubeadmConfigPatches:
+      - |
+        kind: JoinConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "dedicated=monitoring"

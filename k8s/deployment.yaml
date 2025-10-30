@@ -18,7 +18,7 @@ spec:
       - name: frontend
         image: punhaniabhishek/kube-demo:web
         ports:
-        - containerPort: 3000
+        - containerPort: 2000
         env:
         - name: NODE_ENV
           value: "production"
@@ -80,3 +80,96 @@ spec:
         image: redis:alpine
         ports:
         - containerPort: 6379
+
+
+--- 
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      env: demo
+      app: prometheus
+      tier: monitoring
+  template:
+    metadata:
+      labels:
+        env: demo
+        app: prometheus
+        tier: monitoring
+    spec:
+      spec:
+      containers:
+      - name: prometheus
+        image: prom/prometheus
+        ports:
+        - containerPort: 9090
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/prometheus/
+      volumes:
+        - name: config-volume
+          configMap:
+            name: demo-config
+      nodeSelector:
+        dedicated: monitoring
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      env: demo
+      app: grafana
+      tier: monitoring
+  template:
+    metadata:
+      labels:
+        env: demo
+        app: grafana
+        tier: monitoring
+    spec:
+      containers:
+      - name: grafana
+        image: grafana/grafana
+        ports:
+        - containerPort: 3000
+      nodeSelector:
+        dedicated: monitoring 
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loki-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      env: demo
+      app: loki
+      tier: monitoring
+  template:
+    metadata:
+      labels:
+        env: demo
+        app: loki
+        tier: monitoring
+    spec:
+      containers:
+      - name: loki
+        image: grafana/loki:2.4.1
+        ports:
+        - containerPort: 3100
+      nodeSelector:
+        dedicated: monitoring
+      
