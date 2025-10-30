@@ -15,11 +15,15 @@ import { Server } from "socket.io";
 import http from "http";
 import { QueueManager } from "./queueManager";
 import { RedisManager } from "./redisManager";
+import responseTime from "response-time";
 
 import { errorHandler } from "../middleware/errorHandler";
 import { BaseConfig } from "../types/config";
 import webSocketService from "./webSocketServer";
 import { DatabaseManager } from "./dbManager";
+
+import winston from "winston";
+const LokiTransport = require("winston-loki");
 
 export interface AppOptions {
   serviceName: string;
@@ -34,6 +38,7 @@ export interface AppOptions {
     max: number;
   };
   customCors?: cors.CorsOptions;
+  promClient?: any;
 }
 
 export class BaseApp {
@@ -41,13 +46,19 @@ export class BaseApp {
   public server?: http.Server;
   public io?: Server;
   public queueManager?: QueueManager;
+  public promClient?: any;
   private config: BaseConfig;
   private serviceName: string;
+  private logger?: winston.Logger;
 
   constructor(options: AppOptions) {
     this.app = express();
     this.config = options.config;
     this.serviceName = options.serviceName;
+    this.promClient = require("prom-client");
+
+    this.setupLogger();
+    this.setupPrometheus();
 
     this.initializeMiddleware(options);
 
@@ -60,13 +71,92 @@ export class BaseApp {
     }
   }
 
+  private setupLogger(): void {
+    const lokiHost =
+      (this.config as any).LOKI_URL ||
+      process.env.LOKI_URL ||
+      "http://localhost:3000";
+
+    this.logger = winston.createLogger({
+      level: (this.config as any).LOG_LEVEL || process.env.LOG_LEVEL || "info",
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.errors({ stack: true }),
+        winston.format.splat(),
+        winston.format.json()
+      ),
+      transports: [
+        new winston.transports.Console({
+          format:
+            this.config.NODE_ENV === "production"
+              ? winston.format.json()
+              : winston.format.combine(
+                  winston.format.colorize(),
+                  winston.format.simple()
+                ),
+        }),
+        new LokiTransport({
+          host: lokiHost,
+          labels: { service: this.serviceName },
+          json: true,
+          // optional: add timeout/interval options if needed
+          // timeout: 10000,
+        }),
+      ],
+      exitOnError: false,
+    });
+  }
+
+  private async setupPrometheus(): Promise<void> {
+    if (this.promClient) {
+      const reqResTime = new this.promClient.Histogram({
+        name: "http_request_duration_seconds",
+        help: "Duration of HTTP requests in seconds",
+        labelNames: ["method", "route", "status_code"],
+        buckets: [1, 2, 5, 50, 100, 200, 300, 400, 500],
+      });
+      const TotalRequestCounter = new this.promClient.Counter({
+        name: "http_requests_total",
+        help: "Total number of HTTP requests",
+      });
+      const collectDefaultMetrics = this.promClient.collectDefaultMetrics;
+      collectDefaultMetrics({ timeout: 5000 });
+      this.app.use(
+        responseTime((req: Request, res: Response, time: number) => {
+          TotalRequestCounter.inc();
+          reqResTime
+            .labels(req.method, req.path, res.statusCode.toString())
+            .observe(time);
+        })
+      );
+      this.app.get("/metrics", async (req: Request, res: Response) => {
+        res.set("Content-Type", this.promClient.register.contentType);
+        res.end(await this.promClient.register.metrics());
+      });
+    }
+  }
+
   private initializeMiddleware(options: AppOptions): void {
     // Trust proxy for deployment
     this.app.set("trust proxy", 1);
 
-    // Development logging
+    // Morgan logging (stream to winston)
+    const morganStream = {
+      write: (message: string) => {
+        if (this.logger) {
+          this.logger.info(message.trim());
+        } else {
+          process.stdout.write(message);
+        }
+      },
+    };
+
+    // Development logging (uses winston via morganStream)
     if (this.config.NODE_ENV !== "production") {
-      this.app.use(morgan("dev"));
+      this.app.use(morgan("dev", { stream: morganStream }));
+    } else {
+      // In production use combined format
+      this.app.use(morgan("combined", { stream: morganStream }));
     }
 
     // Security middleware
@@ -157,7 +247,7 @@ export class BaseApp {
   }
 
   private initializeSessions(): void {
-    console.log("config");
+    this.logger?.info("Initializing sessions");
     const store = MongoStore.create({
       mongoUrl: this.config.DB_URL,
       crypto: {
@@ -204,12 +294,15 @@ export class BaseApp {
     // Optionally: Make globally available
     (global as any).io = this.io;
     (global as any).webSocketService = webSocketService;
+
+    this.logger?.info("Socket.IO initialized");
   }
 
   private async initializeQueues(): Promise<void> {
     this.queueManager = QueueManager.getInstance();
     await this.queueManager.initialize();
     (global as any).queueManager = this.queueManager;
+    this.logger?.info("Queues initialized");
   }
 
   // Method to add routes
@@ -232,7 +325,7 @@ export class BaseApp {
       const serverInstance = this.server || this.app;
 
       serverInstance.listen(port, () => {
-        console.log(`🚀 ${this.serviceName} listening on port ${port}`);
+        this.logger?.info(`🚀 ${this.serviceName} listening on port ${port}`);
         resolve();
       });
     });
@@ -254,7 +347,7 @@ export class BaseApp {
     if (this.server) {
       return new Promise((resolve) => {
         this.server!.close(() => {
-          console.log(`🛑 ${this.serviceName} server closed`);
+          this.logger?.info(`🛑 ${this.serviceName} server closed`);
           resolve();
         });
       });
@@ -276,15 +369,15 @@ export class BaseApp {
       }
 
       await this.listen(port);
-      console.log(`🚀 ${this.serviceName} started successfully`);
+      this.logger?.info(`🚀 ${this.serviceName} started successfully`);
     } catch (error) {
-      console.error(`💥 Failed to start ${this.serviceName}:`, error);
+      this.logger?.error(`💥 Failed to start ${this.serviceName}:`, error);
       process.exit(1);
     }
   }
 
   public async shutdown(db: DatabaseManager) {
-    console.log(`🛑 Shutting down ${this.serviceName}...`);
+    this.logger?.info(`🛑 Shutting down ${this.serviceName}...`);
     if (this.queueManager) {
       await this.queueManager.shutdown();
     }

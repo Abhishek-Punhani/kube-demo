@@ -1,0 +1,29 @@
+services:
+  prom-server:
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - monitoring-net
+    
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    networks:
+      - monitoring-net
+  
+  grafana-loki:
+    image: grafana/loki:2.4.1
+    ports:
+      - 3100:3100
+    networks:
+      - monitoring-net
+
+networks:
+  monitoring-net:
+    driver: bridge
