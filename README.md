@@ -59,21 +59,13 @@ A full-stack demo application with a Node.js backend (demo-server), Next.js fron
    ```bash
    ./k8s/start.sh
    ```
-
-   Or manually:
-
-   ```bash
-   kind create cluster --name kube-demo --config k8s/kind.yaml
-   kubectl apply -f k8s/config.yaml
-   kubectl apply -f k8s/deployment.yaml
-   kubectl apply -f k8s/svc.yaml
-   kubectl apply -f k8s/load-balancer.yaml
-   ```
-
 2. Access services:
-   - Frontend: http://localhost:80
-   - Demo-server: http://localhost:4000
-   - Redis: localhost:6379
+   - Frontend: http://localhost
+   - Demo Server API: http://api.localhost
+   - Grafana: http://grafana.localhost
+   - Prometheus: http://prometheus.localhost
+   - Loki: http://loki.localhost
+   - Redis: localhost:6379 (internal only)
 
 ## Monitoring Stack
 
@@ -83,15 +75,15 @@ The project includes a complete observability setup with Prometheus, Grafana, an
 
 After deploying to Kubernetes, access the monitoring stack:
 
-- **Grafana** (Dashboards & Visualization): http://localhost:3000
-  - Default login: `admin` / `admin`
+- **Grafana** (Dashboards & Visualization): http://grafana.localhost
+  - Default login: `admin` / `admin` (or get password: `kubectl get secret --namespace monitoring grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo`)
   - Pre-configured datasources for Prometheus and Loki
 
-- **Prometheus** (Metrics Collection): http://localhost:9090
+- **Prometheus** (Metrics Collection): http://prometheus.localhost
   - Scrapes metrics from demo-server at `/metrics` endpoint
   - Query metrics with PromQL
 
-- **Loki** (Log Aggregation): http://localhost:3100
+- **Loki** (Log Aggregation): http://loki.localhost
   - Receives logs from demo-server via HTTP API
   - Query logs with LogQL in Grafana
 
