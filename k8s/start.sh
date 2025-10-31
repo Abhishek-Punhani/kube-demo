@@ -8,3 +8,4 @@ kubectl apply -f deployment.yaml
 kubectl apply -f clusterIp.yaml
 kubectl apply -f nodePort.yaml
 kubectl apply -f load-balancer.yaml
+kubectl apply -f metrics-server.yaml
