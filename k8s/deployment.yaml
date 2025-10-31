@@ -81,8 +81,7 @@ spec:
         ports:
         - containerPort: 6379
 
-
---- 
+---
 
 apiVersion: apps/v1
 kind: Deployment
@@ -102,7 +101,8 @@ spec:
         app: prometheus
         tier: monitoring
     spec:
-      spec:
+      nodeSelector:
+        dedicated: monitoring
       containers:
       - name: prometheus
         image: prom/prometheus
@@ -110,15 +110,18 @@ spec:
         - containerPort: 9090
         volumeMounts:
         - name: config-volume
-          mountPath: /etc/prometheus/
+          mountPath: /etc/prometheus/prometheus.yml
+          subPath: prometheus.yml
       volumes:
-        - name: config-volume
-          configMap:
-            name: demo-config
-      nodeSelector:
-        dedicated: monitoring
+      - name: config-volume
+        configMap:
+          name: demo-config
+          items:
+          - key: prometheus.yml
+            path: prometheus.yml
 
 ---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -137,13 +140,26 @@ spec:
         app: grafana
         tier: monitoring
     spec:
+      nodeSelector:
+        dedicated: monitoring
       containers:
       - name: grafana
         image: grafana/grafana
         ports:
         - containerPort: 3000
-      nodeSelector:
-        dedicated: monitoring 
+        env:
+        - name: GF_SERVER_ROOT_URL
+          value: "http://grafana.localhost"
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          value: "admin"
+        volumeMounts:
+        - name: grafana-datasources
+          mountPath: /etc/grafana/provisioning/datasources
+          readOnly: true
+      volumes:
+      - name: grafana-datasources
+        configMap:
+          name: grafana-datasources
 
 ---
 
@@ -165,11 +181,10 @@ spec:
         app: loki
         tier: monitoring
     spec:
+      nodeSelector:
+        dedicated: monitoring
       containers:
       - name: loki
         image: grafana/loki:2.4.1
         ports:
         - containerPort: 3100
-      nodeSelector:
-        dedicated: monitoring
-      
