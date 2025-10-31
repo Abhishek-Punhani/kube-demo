@@ -23,7 +23,7 @@ COPY apps/web/ ./apps/web/
 RUN cd apps/web && pnpm run build
 
 # Expose port
-EXPOSE 3000
+EXPOSE 2000
 
 # Start the app
-CMD ["sh", "-c", "cd apps/web && pnpm start"]
+CMD ["sh", "-c", "cd apps/web && pnpm start --port 2000"]
