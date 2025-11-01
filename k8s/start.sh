@@ -44,12 +44,8 @@ echo ""
 
 # Apply application configs
 echo "Applying application configurations..."
-kubectl apply -f config.yaml
-kubectl apply -f deployment.yaml
-kubectl apply -f clusterIp.yaml
-kubectl apply -f ingress.yaml
 kubectl apply -f argoCd.yaml
-# kubectl apply -f metrics-server.yaml
+kubectl apply -f metrics-server.yaml
 
 echo "Deployment complete!"
 echo ""
