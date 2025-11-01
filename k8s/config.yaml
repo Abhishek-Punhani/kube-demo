@@ -57,7 +57,6 @@ data:
       alertmanager_url: http://localhost:9093
 
 ---
-
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -65,7 +64,7 @@ metadata:
 data:
   NODE_ENV: "production"
   CLIENT_URL: "http://frontend-clusterip:2000"
-  REDIS_HOST: "redis"
+  REDIS_HOST: "redis-clusterip"
   REDIS_PORT: "6379"
   DISABLE_REDIS_QUEUES: "false"
   PENDING_ORDER_WORKER_CONCURRENCY: "5"
@@ -74,7 +73,6 @@ data:
   LOKI_URL: "http://grafana-loki-clusterip:3100"
 
 ---
-
 apiVersion: v1
 kind: ConfigMap
 metadata:

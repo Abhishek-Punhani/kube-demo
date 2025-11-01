@@ -36,6 +36,10 @@ kubectl wait --namespace argocd \
 # Port-forward ArgoCD server
 kubectl port-forward svc/argocd-server -n argocd 8080:80 &
 echo "ArgoCD is available at http://localhost:8080 (username: admin, password: $(kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d))"
+echo "ArgoCD initial admin password:"
+echo "-------------------------------------"
+kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d
+echo "-------------------------------------"
 echo ""
 
 # Apply application configs
