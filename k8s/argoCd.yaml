@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-demo
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: "https://github.com/Abhishek-Punhani/kube-demo.git"
+    targetRevision: HEAD
+    path: "k8s"
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: kube-demo
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
