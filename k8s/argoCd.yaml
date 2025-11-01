@@ -12,11 +12,7 @@ spec:
     path: k8s
     directory:
       recurse: true
-      exclude: |
-        kind.yaml
-        start.sh
-        argoCd.yaml
-        legacy/*
+      exclude: "{kind.yaml,start.sh,argoCd.yaml,legacy/*}"
   destination:
     server: https://kubernetes.default.svc
     namespace: default
