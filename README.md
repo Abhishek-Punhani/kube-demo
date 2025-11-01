@@ -59,6 +59,7 @@ A full-stack demo application with a Node.js backend (demo-server), Next.js fron
    ```bash
    ./k8s/start.sh
    ```
+
 2. Access services:
    - Frontend: http://localhost
    - Demo Server API: http://api.localhost
@@ -195,10 +196,47 @@ kubectl exec deployment/grafana-deploy -- wget -qO- http://grafana-loki-clusteri
 kubectl logs deployment/demo-server-deploy | grep -i loki
 ```
 
-3. Clean up:
-   ```bash
-   kind delete cluster --name kube-demo
-   ```
+## ArgoCD GitOps Deployment
+
+The project includes ArgoCD for GitOps-based deployment management.
+
+### Setting Up ArgoCD
+
+1. ArgoCD is automatically installed when running `./k8s/start.sh`
+
+2. Access ArgoCD UI:
+   - URL: http://localhost:8080
+   - Username: admin
+   - Password: Retrieved automatically during setup (shown in terminal)
+
+3. The `kube-demo` application is automatically created and configured to:
+   - Sync from the `k8s/` directory in this repository
+   - Deploy to the `default` namespace
+   - Auto-sync changes with pruning and self-healing enabled
+
+### ArgoCD Application Structure
+
+The ArgoCD application deploys:
+
+- ConfigMaps (`config.yaml`)
+- Deployments (`deployment.yaml`)
+- Services (`clusterIp.yaml`)
+- Ingress (`ingress.yaml`)
+- Metrics Server (`metrics-server.yaml`)
+
+Excluded from ArgoCD deployment:
+
+- `kind.yaml` (Kind cluster configuration)
+- `start.sh` (setup script)
+- `argoCd.yaml` (ArgoCD application itself)
+- `legacy/` directory (old configurations)
+
+### Managing Deployments with ArgoCD
+
+- **Manual Sync**: Click "Sync" in ArgoCD UI to manually deploy changes
+- **Auto-sync**: Enabled by default - changes to the repository automatically deploy
+- **Rollback**: Use ArgoCD UI to rollback to previous versions
+- **Monitoring**: Check sync status and health in ArgoCD dashboard
 
 ## Scripts
 
@@ -206,6 +244,7 @@ kubectl logs deployment/demo-server-deploy | grep -i loki
 - `pnpm run build`: Build all apps.
 - `docker compose up --build`: Run with containers.
 - `kind create cluster --config k8s/kind.yaml`: Set up K8s cluster.
+- `./k8s/start.sh`: Complete setup with Kind cluster, ArgoCD, and all services.
 
 ## Notes
 
