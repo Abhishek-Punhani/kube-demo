@@ -5,8 +5,7 @@ metadata:
   name: letsencrypt-prod
 spec:
   acme:
-    # Replace with your email
-    email: abhishek@kube-demo.abhi07.xyz
+    email:  punhani.manavabhi@gmail.com
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: letsencrypt-prod
@@ -21,8 +20,7 @@ metadata:
   name: letsencrypt-staging
 spec:
   acme:
-    # Replace with your email
-    email: abhishek@kube-demo.abhi07.xyz
+    email:  punhani.manavabhi@gmail.com
     server: https://acme-staging-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: letsencrypt-staging
