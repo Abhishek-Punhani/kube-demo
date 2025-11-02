@@ -2,8 +2,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kube-demo
+  name: abhishek-cluster
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
@@ -12,7 +14,7 @@ spec:
     path: k8s
     directory:
       recurse: true
-      exclude: "{kind.yaml,start.sh,argoCd.yaml,legacy/*}"
+      exclude: "{kind.yaml,start.sh,argoCd.yaml,cert-manager-issuer.yaml,legacy/*}"
   destination:
     server: https://kubernetes.default.svc
     namespace: default
@@ -20,3 +22,5 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

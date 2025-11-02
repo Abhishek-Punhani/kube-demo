@@ -4,61 +4,85 @@ metadata:
   name: demo-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    # For HTTPS with cert-manager, uncomment the line below and configure cert-manager
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   ingressClassName: nginx
+  # Uncomment for HTTPS/TLS
+  # tls:
+  # - hosts:
+  #   - abhi07.xyz
+  #   - api.abhi07.xyz
+  #   - grafana.abhi07.xyz
+  #   - prometheus.abhi07.xyz
+  #   - loki.abhi07.xyz
+  #   - argocd.abhi07.xyz
+  #   secretName: kube-demo-tls
   rules:
-  # Frontend
-  - host: localhost
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: frontend-clusterip
-            port:
-              number: 2000
-  # Demo Server API
-  - host: api.localhost
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: demo-server-clusterip
-            port:
-              number: 4000
-  # Grafana
-  - host: grafana.localhost
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: grafana-clusterip
-            port:
-              number: 3000
-  # Prometheus
-  - host: prometheus.localhost
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: prometheus-clusterip
-            port:
-              number: 9090
-  # Loki
-  - host: loki.localhost
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: grafana-loki-clusterip
-            port:
-              number: 3100
+    # Frontend - Replace 'abhi07.xyz' with your actual domain or use INGRESS_IP.nip.io
+    - host: abhi07.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-clusterip
+                port:
+                  number: 2000
+    # Demo Server API
+    - host: api.abhi07.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: demo-server-clusterip
+                port:
+                  number: 4000
+    # Grafana
+    - host: grafana.abhi07.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grafana-clusterip
+                port:
+                  number: 3000
+    # Prometheus
+    - host: prometheus.abhi07.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: prometheus-clusterip
+                port:
+                  number: 9090
+    # Loki
+    - host: loki.abhi07.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grafana-loki-clusterip
+                port:
+                  number: 3100
+    # ArgoCD
+    - host: argocd.abhi07.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: argocd-server
+                port:
+                  number: 80

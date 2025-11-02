@@ -54,6 +54,8 @@ A full-stack demo application with a Node.js backend (demo-server), Next.js fron
 
 ## Kubernetes Deployment
 
+### Local Development (Kind)
+
 1. Create Kind cluster and apply manifests (automated):
 
    ```bash
@@ -67,6 +69,24 @@ A full-stack demo application with a Node.js backend (demo-server), Next.js fron
    - Prometheus: http://prometheus.localhost
    - Loki: http://loki.localhost
    - Redis: localhost:6379 (internal only)
+
+### Cloud Deployment (Civo)
+
+1. Deploy to Civo Cloud with external domain access:
+
+   ```bash
+   ./k8s/civo.sh
+   ```
+
+2. Access services (replace `your-domain.com` with your domain or use nip.io):
+   - Frontend: http://your-domain.com
+   - Demo Server API: http://api.your-domain.com
+   - Grafana: http://grafana.your-domain.com
+   - Prometheus: http://prometheus.your-domain.com
+   - Loki: http://loki.your-domain.com
+   - ArgoCD: http://argocd.your-domain.com
+
+   See `k8s/DEPLOY_TO_CIVO.md` for detailed instructions.
 
 ## Monitoring Stack
 
@@ -202,10 +222,11 @@ The project includes ArgoCD for GitOps-based deployment management.
 
 ### Setting Up ArgoCD
 
-1. ArgoCD is automatically installed when running `./k8s/start.sh`
+1. ArgoCD is automatically installed when running `./k8s/start.sh` (local) or `./k8s/civo.sh` (cloud)
 
 2. Access ArgoCD UI:
-   - URL: http://localhost:8080
+   - **Local (Kind)**: http://localhost:8080 (port-forwarded)
+   - **Cloud (Civo)**: http://argocd.your-domain.com
    - Username: admin
    - Password: Retrieved automatically during setup (shown in terminal)
 
@@ -244,7 +265,8 @@ Excluded from ArgoCD deployment:
 - `pnpm run build`: Build all apps.
 - `docker compose up --build`: Run with containers.
 - `kind create cluster --config k8s/kind.yaml`: Set up K8s cluster.
-- `./k8s/start.sh`: Complete setup with Kind cluster, ArgoCD, and all services.
+- `./k8s/start.sh`: Complete setup with Kind cluster, ArgoCD, and all services (local).
+- `./k8s/civo.sh`: Deploy to Civo Cloud with external domain access.
 
 ## Notes
 
