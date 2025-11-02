@@ -4,24 +4,22 @@ metadata:
   name: demo-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    # For HTTPS with cert-manager, uncomment the line below and configure cert-manager
-    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   ingressClassName: nginx
-  # Uncomment for HTTPS/TLS
-  # tls:
-  # - hosts:
-  #   - abhi07.xyz
-  #   - api.abhi07.xyz
-  #   - grafana.abhi07.xyz
-  #   - prometheus.abhi07.xyz
-  #   - loki.abhi07.xyz
-  #   - argocd.abhi07.xyz
-  #   secretName: kube-demo-tls
+  tls:
+    - hosts:
+        - kube-demo.abhi07.xyz
+        - api.kube-demo.abhi07.xyz
+        - grafana.kube-demo.abhi07.xyz
+        - prometheus.kube-demo.abhi07.xyz
+        - loki.kube-demo.abhi07.xyz
+        - argocd.kube-demo.abhi07.xyz
+      secretName: kube-demo-tls
   rules:
-    # Frontend - Replace 'abhi07.xyz' with your actual domain or use INGRESS_IP.nip.io
-    - host: abhi07.xyz
+    # Frontend - Replace 'kube-demo.abhi07.xyz' with your actual domain or use INGRESS_IP.nip.io
+    - host: kube-demo.abhi07.xyz
       http:
         paths:
           - path: /
@@ -32,7 +30,7 @@ spec:
                 port:
                   number: 2000
     # Demo Server API
-    - host: api.abhi07.xyz
+    - host: api.kube-demo.abhi07.xyz
       http:
         paths:
           - path: /
@@ -43,7 +41,7 @@ spec:
                 port:
                   number: 4000
     # Grafana
-    - host: grafana.abhi07.xyz
+    - host: grafana.kube-demo.abhi07.xyz
       http:
         paths:
           - path: /
@@ -54,7 +52,7 @@ spec:
                 port:
                   number: 3000
     # Prometheus
-    - host: prometheus.abhi07.xyz
+    - host: prometheus.kube-demo.abhi07.xyz
       http:
         paths:
           - path: /
@@ -65,7 +63,7 @@ spec:
                 port:
                   number: 9090
     # Loki
-    - host: loki.abhi07.xyz
+    - host: loki.kube-demo.abhi07.xyz
       http:
         paths:
           - path: /
@@ -76,7 +74,7 @@ spec:
                 port:
                   number: 3100
     # ArgoCD
-    - host: argocd.abhi07.xyz
+    - host: argocd.kube-demo.abhi07.xyz
       http:
         paths:
           - path: /
