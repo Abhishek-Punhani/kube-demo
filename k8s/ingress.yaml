@@ -18,7 +18,6 @@ spec:
         - argocd.kube-demo.abhi07.xyz
       secretName: kube-demo-tls
   rules:
-    # Frontend - Replace 'kube-demo.abhi07.xyz' with your actual domain or use INGRESS_IP.nip.io
     - host: kube-demo.abhi07.xyz
       http:
         paths:
