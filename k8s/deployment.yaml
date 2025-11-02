@@ -101,8 +101,6 @@ spec:
         app: prometheus
         tier: monitoring
     spec:
-      nodeSelector:
-        dedicated: monitoring
       containers:
       - name: prometheus
         image: prom/prometheus
@@ -140,8 +138,6 @@ spec:
         app: grafana
         tier: monitoring
     spec:
-      nodeSelector:
-        dedicated: monitoring
       containers:
       - name: grafana
         image: grafana/grafana
@@ -181,8 +177,6 @@ spec:
         app: loki
         tier: monitoring
     spec:
-      nodeSelector:
-        dedicated: monitoring
       containers:
       - name: loki
         image: grafana/loki:2.4.1
